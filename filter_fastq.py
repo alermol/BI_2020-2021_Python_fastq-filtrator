@@ -139,3 +139,67 @@ args = args_nt(min_length=min_length,
                output_base_name=output_base_name,
                fastq_file=fastq_file)
 
+print(
+f"""
+Start parameters:
+min_length        {args.min_length}
+keep_filtered     {args.keep_filtered}
+gc_bounds         {args.gc_bounds[0]} (lower); {args.gc_bounds[1]} (upper)
+output_base_name  {args.output_base_name}
+--------------------------------------------------------------------------
+***Script in progress***
+"""
+)
+
+
+def create_generator(file):
+    for line in file:
+        yield line
+
+
+def get_read(generator):
+    single_read = []
+    top4 = itertools.islice(generator, 4)
+    for read_fields in top4:
+        single_read.append(read_fields.strip())
+    return single_read
+
+
+def count_lines_number(file):
+    line_number = 0
+    for _ in file:
+        line_number += 1
+    return line_number
+
+
+passed_name = f'{args.output_base_name}_passed.fastq'
+with open(args.fastq_file) as fq, open(passed_name, 'w') as passed:
+    lines_number = count_lines_number(fq)
+    if args.keep_filtered:
+        failed_file = open(f'{args.output_base_name}_failed.fastq', 'w')
+    reads_generator = create_generator(open(args.fastq_file))
+    for i in range(lines_number // 4):
+        read = get_read(reads_generator)
+        filter_res = [None, None]
+        if args.min_length is not None:
+            if len(read[1]) >= args.min_length:
+                filter_res[0] = True
+            else:
+                filter_res[0] = False
+        if args.gc_bounds is not None:
+            gc_percent = (read[1].count('G') +
+                          read[1].count('C')) / len(read[1]) * 100
+            if args.gc_bounds[0] <= gc_percent <= args.gc_bounds[1]:
+                filter_res[1] = True
+            else:
+                filter_res[1] = False
+        if all(filter_res):
+            passed.write("\n".join(read))
+        else:
+            try:
+                failed_file.write("\n".join(read))
+            except NameError:
+                pass
+    failed_file.close()
+
+print('***Done***')
