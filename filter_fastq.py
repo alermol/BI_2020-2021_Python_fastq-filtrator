@@ -193,7 +193,7 @@ with open(args.fastq_file) as fq, open(passed_name, 'w') as passed:
             filter_res[1] = False
         if all(filter_res):
             passed.write("\n".join(read))
-        elif 'failed_file' in globals():
+        elif 'failed_file' in globals() and not all(filter_res):
             failed_file.write("\n".join(read))
         else:
             continue
