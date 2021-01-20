@@ -12,7 +12,7 @@ Optional arguments:
     Flag. Write not passed the filter reads in file.
 
     --gc_bounds INT INT
-    Takes 1 or 2 values separated by sapce - lower and upper bounds of
+    Takes 1 or 2 values separated by space - lower and upper bounds of
     GC-content for read to pass the filter. If single value is get its
     counts as upper bound. Lower bound must lower of equal to upper.
     Both bounds must be >= 0.
@@ -32,10 +32,10 @@ Example:
     --gc_bounds 55 70 --output_base_name output_reads reads.fastq
 '''
 
-from collections import namedtuple
-import sys
-from pathlib import Path
 import itertools
+import sys
+from collections import namedtuple
+from pathlib import Path
 
 args = sys.argv[1:]
 
@@ -63,7 +63,7 @@ if '--min_length' in args:
         min_length = int(args[min_length_index + 1])
         del args[min_length_index:min_length_index + 2]
 else:
-    min_length = None
+    min_length = 0
 
 if '--output_base_name' in args:
     output_base_name_arg = args.index('--output_base_name')
@@ -128,7 +128,7 @@ if '--gc_bounds' in args:
         else:
             bounds = (lower_bound, upper_bound)
 else:
-    bounds = None
+    bounds = (0, 100)
 
 args_nt = namedtuple(
     'args',
@@ -140,7 +140,7 @@ args = args_nt(min_length=min_length,
                fastq_file=fastq_file)
 
 print(
-f"""
+    f"""
 Start parameters:
 min_length        {args.min_length}
 keep_filtered     {args.keep_filtered}
@@ -181,25 +181,23 @@ with open(args.fastq_file) as fq, open(passed_name, 'w') as passed:
     for i in range(lines_number // 4):
         read = get_read(reads_generator)
         filter_res = [None, None]
-        if args.min_length is not None:
-            if len(read[1]) >= args.min_length:
-                filter_res[0] = True
-            else:
-                filter_res[0] = False
-        if args.gc_bounds is not None:
-            gc_percent = (read[1].count('G') +
-                          read[1].count('C')) / len(read[1]) * 100
-            if args.gc_bounds[0] <= gc_percent <= args.gc_bounds[1]:
-                filter_res[1] = True
-            else:
-                filter_res[1] = False
+        if len(read[1]) >= args.min_length:
+            filter_res[0] = True
+        else:
+            filter_res[0] = False
+        gc_percent = (read[1].count('G') +
+                      read[1].count('C')) / len(read[1]) * 100
+        if args.gc_bounds[0] <= gc_percent <= args.gc_bounds[1]:
+            filter_res[1] = True
+        else:
+            filter_res[1] = False
         if all(filter_res):
             passed.write("\n".join(read))
+        elif 'failed_file' in globals():
+            failed_file.write("\n".join(read))
         else:
-            try:
-                failed_file.write("\n".join(read))
-            except NameError:
-                pass
+            continue
+if 'failed_file' in globals():
     failed_file.close()
 
 print('***Done***')
