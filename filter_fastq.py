@@ -115,8 +115,7 @@ if '--gc_bounds' in args:
     try:
         lower_bound = args[arg_index + 1]
         upper_bound = args[arg_index + 2]
-        if (not args[arg_index + 1].isdigit() or
-                not args[arg_index + 2].isdigit()):
+        if not (args[arg_index + 1].isdigit() and args[arg_index + 2].isdigit()):
             raise TypeError('Both bounds values must be numeric')
     except TypeError as gc_bound_error:
         raise gc_bound_error
