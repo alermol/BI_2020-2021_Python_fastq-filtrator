@@ -18,7 +18,8 @@ Optional arguments:
     Both bounds must be >= 0.
 
     --output_base_name STR
-    Prefix for output file(s).
+    Prefix for output file(s). If not specified the name of original file
+    will be used as a prefix.
 
 
 Positional arguments:
