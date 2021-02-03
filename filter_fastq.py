@@ -1,9 +1,9 @@
-'''
+"""
 Authors: Aleksey Ermolaev, Danko Katerina
 
 Script to filter fastq file.
 
-'''
+"""
 
 import itertools
 import sys
@@ -14,7 +14,7 @@ args = sys.argv[1:]
 
 if len(args) == 1 and '-h' in args:
     sys.exit(
-        '''
+        """
     Optional arguments:
 
         --min_length INT
@@ -46,7 +46,7 @@ if len(args) == 1 and '-h' in args:
     Example:
         python3 fastq_filtrator.py --min_length 50 --keep_filtered
         --gc_bounds 55 70 --output_base_name output_reads reads.fastq
-    '''
+    """
     )
 elif '-h' in args and len(args) > 1:
     sys.exit('-h can not be used together with other arguments')
