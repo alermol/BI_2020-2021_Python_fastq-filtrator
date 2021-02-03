@@ -24,7 +24,7 @@ Optional arguments:
 
 Positional arguments:
 
-    fastq file
+    fastq_file
     fastq file to process.
 
 
