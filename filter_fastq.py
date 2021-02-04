@@ -199,12 +199,12 @@ with open(args.fastq_file) as fq, open(passed_name, 'w') as passed:
             filter_res[1] = False
         if all(filter_res):
             passed.write("\n".join(read))
-        elif 'failed_file' in globals() and not all(filter_res):
+        elif args.keep_filtered and not all(filter_res):
             failed_file.write("\n".join(read))
         else:
             continue
     fastq_file.close()    
-if 'failed_file' in globals():
+if args.keep_filtered:
     failed_file.close()
     
 print('***Done***')
