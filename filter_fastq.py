@@ -50,8 +50,6 @@ if len(args) == 1 and '-h' in args:
     )
 elif '-h' in args and len(args) > 1:
     sys.exit('-h can not be used together with other arguments')
-else:
-    sys.exit('Unknown arguments')
 
 try:
     if not Path(args[-1]).exists():
