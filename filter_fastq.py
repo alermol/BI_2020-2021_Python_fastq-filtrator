@@ -163,11 +163,6 @@ output_base_name  {args.output_base_name}
 )
 
 
-def create_generator(file):
-    for line in file:
-        yield line
-
-
 def get_read(generator):
     single_read = []
     top4 = itertools.islice(generator, 4)
@@ -188,9 +183,9 @@ with open(args.fastq_file) as fq, open(passed_name, 'w') as passed:
     lines_number = count_lines_number(fq)
     if args.keep_filtered:
         failed_file = open(f'{args.output_base_name}_failed.fastq', 'w')
-    reads_generator = create_generator(open(args.fastq_file))
+    fastq_file = open(args.fastq_file)    
     for i in range(lines_number // 4):
-        read = get_read(reads_generator)
+        read = get_read(fastq_file)
         filter_res = [None, None]
         if len(read[1]) >= args.min_length:
             filter_res[0] = True
@@ -208,7 +203,8 @@ with open(args.fastq_file) as fq, open(passed_name, 'w') as passed:
             failed_file.write("\n".join(read))
         else:
             continue
+    fastq_file.close()    
 if 'failed_file' in globals():
     failed_file.close()
-
+    
 print('***Done***')
