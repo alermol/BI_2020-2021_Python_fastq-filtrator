@@ -57,7 +57,7 @@ try:
     if not Path(args[-1]).is_file():
         raise IsADirectoryError(f'{args[-1]} is not a file')
 except (FileExistsError, IsADirectoryError) as fastq_file_error:
-    raise fastq_file_error
+    sys.exit(fastq_file_error)
 else:
     fastq_file = args[-1]
     del args[-1]
@@ -70,7 +70,7 @@ if '--min_length' in args:
         if int(args[min_length_index + 1]) <= 0:
             raise ValueError('Value for --min_length must be > 0')
     except (NameError, ValueError) as min_length_error:
-        raise min_length_error
+        sys.exit(min_length_error)
     else:
         min_length = int(args[min_length_index + 1])
         del args[min_length_index:min_length_index + 2]
@@ -83,7 +83,7 @@ if '--output_base_name' in args:
         if '--' in args[output_base_name_arg + 1]:
             raise ValueError("Argument --output_base_name must have a value")
     except ValueError as output_base_name_error:
-        raise output_base_name_error
+        sys.exit(output_base_name_error)
     else:
         output_base_name = args[output_base_name_arg + 1]
         del args[output_base_name_arg:output_base_name_arg + 2]
@@ -101,7 +101,7 @@ if '--keep_filtered' in args:
                 raise ValueError(
                     'Argument --keep-filtered does not require value')
         except ValueError as keep_filtered_error:
-            raise keep_filtered_error
+            sys.exit(keep_filtered_error)
         else:
             KEEP_FILTERED = True
             del args[arg_index]
@@ -116,14 +116,14 @@ if '--gc_bounds' in args:
         if not (args[arg_index + 1].isdigit() and args[arg_index + 2].isdigit()):
             raise TypeError('Both bounds values must be numeric')
     except TypeError as gc_bound_error:
-        raise gc_bound_error
+        sys.exit(gc_bound_error)
     except IndexError:
         try:
             upper_bound = args[arg_index + 1]
             if not upper_bound.isdigit():
                 raise TypeError('Bound value must be numeric') from None
         except TypeError as gc_bound_error:
-            raise gc_bound_error
+            sys.exit(gc_bound_error)
         else:
             bounds = (int(args[arg_index + 1]), 100)
     else:
@@ -135,7 +135,7 @@ if '--gc_bounds' in args:
             if lower_bound > upper_bound:
                 raise ValueError('Upper bound must be >= lower bound')
         except ValueError as gc_bound_error:
-            raise gc_bound_error
+            sys.exit(gc_bound_error)
         else:
             bounds = (lower_bound, upper_bound)
 else:
